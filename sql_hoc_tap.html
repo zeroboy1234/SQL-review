@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SQL Interview Prep – Odoo Intern</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f0; color: #1a1a18; min-height: 100vh; padding: 24px 16px; }
+  .container { max-width: 780px; margin: 0 auto; }
+  h1 { font-size: 20px; font-weight: 600; margin-bottom: 6px; color: #1a1a18; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 20px; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .tab { padding: 6px 14px; font-size: 13px; border-radius: 8px; border: 1px solid #ccc; background: #fff; color: #555; cursor: pointer; transition: all 0.15s; }
+  .tab:hover { background: #f0f0ea; }
+  .tab.active { background: #dbeafe; color: #1d4ed8; border-color: #93c5fd; font-weight: 500; }
+
+  .sec { display: none; }
+  .sec.active { display: block; }
+
+  .card { background: #fff; border: 1px solid #e5e5e0; border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+  .card-head { padding: 10px 16px; background: #f8f8f4; display: flex; justify-content: space-between; align-items: center; cursor: pointer; border-bottom: 1px solid #e5e5e0; }
+  .card-head:hover { background: #f0f0ea; }
+  .card-title { font-size: 13px; font-weight: 600; color: #1a1a18; }
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 6px; }
+  .must { background: #fee2e2; color: #991b1b; }
+  .good { background: #dbeafe; color: #1d4ed8; }
+  .plus { background: #dcfce7; color: #166534; }
+  .chev { font-size: 11px; color: #888; transition: transform 0.2s; margin-left: 8px; }
+  .chev.open { transform: rotate(180deg); }
+
+  .card-body { padding: 16px; display: none; }
+  .card-body.open { display: block; }
+
+  .note { font-size: 13px; color: #444; padding: 10px 12px; background: #eff6ff; border-radius: 8px; border-left: 3px solid #3b82f6; margin-bottom: 12px; line-height: 1.6; }
+  .warn { background: #fffbeb; border-left-color: #f59e0b; color: #444; }
+  .danger { background: #fff1f2; border-left-color: #f43f5e; color: #444; }
+
+  pre, .code { background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace; font-size: 12.5px; padding: 12px 14px; border-radius: 8px; overflow-x: auto; margin-bottom: 12px; line-height: 1.75; white-space: pre; }
+  .kw { color: #569cd6; }
+  .str { color: #98c379; }
+  .cm { color: #6a9955; }
+  .fn { color: #dcdcaa; }
+  .rd { color: #f44747; }
+
+  .result-label { font-size: 11px; font-weight: 600; color: #888; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+  table.result { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table.result th { background: #f0f0ea; padding: 6px 12px; text-align: left; font-weight: 600; color: #444; border: 1px solid #ddd; }
+  table.result td { padding: 6px 12px; border: 1px solid #ddd; color: #1a1a18; background: #fff; }
+  table.result tr:nth-child(even) td { background: #fafafa; }
+  .null-val { color: #dc2626; font-style: italic; }
+
+  /* Diagram tables */
+  .diag-wrap { overflow-x: auto; margin-bottom: 12px; }
+  .diag-table { border-collapse: collapse; min-width: 280px; }
+  .diag-table th { background: #dbeafe; color: #1e3a8a; padding: 7px 14px; font-size: 13px; font-weight: 600; border: 1px solid #93c5fd; }
+  .diag-table td { padding: 6px 14px; font-size: 12px; border: 1px solid #ddd; color: #1a1a18; background: #fff; }
+  .diag-table tr:nth-child(even) td { background: #f8f8f4; }
+  .pk-val { color: #b91c1c; font-weight: 600; }
+  .fk-val { color: #b45309; font-weight: 600; }
+
+  .flex-tables { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 12px; }
+  .flex-tables .diag-wrap { flex: 1; min-width: 220px; }
+
+  .relation-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; color: #1a1a18; }
+  .rel-box { background: #dbeafe; border: 1px solid #93c5fd; border-radius: 8px; padding: 6px 14px; font-weight: 600; color: #1e3a8a; font-size: 13px; }
+  .rel-mid { background: #fef9c3; border: 1px solid #fde047; border-radius: 8px; padding: 6px 14px; font-weight: 600; color: #713f12; font-size: 12px; }
+  .rel-arrow { color: #3b82f6; font-size: 16px; }
+  .rel-note { font-size: 12px; color: #666; }
+
+  .tool-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 14px; }
+  .tool-card { background: #fff; border: 1px solid #ddd; border-radius: 12px; padding: 14px; }
+  .tool-card.featured { border-color: #93c5fd; border-width: 2px; }
+  .tool-name { font-size: 14px; font-weight: 600; color: #1a1a18; margin-bottom: 6px; }
+  .tool-desc { font-size: 12px; color: #555; line-height: 1.6; }
+  .tool-badge { display: inline-block; margin-top: 8px; font-size: 11px; padding: 2px 8px; background: #dbeafe; color: #1d4ed8; border-radius: 6px; }
+
+  .steps { background: #f8f8f4; border-radius: 8px; padding: 12px 16px; font-size: 13px; color: #1a1a18; line-height: 2; }
+  .steps code { background: #e5e5e0; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>SQL Interview Prep – Odoo Intern</h1>
+  <p class="subtitle">Học SQL cơ bản với ví dụ đơn giản, sát thực tế Odoo/PostgreSQL</p>
+
+  <div class="tabs">
+    <div class="tab active" onclick="sw('select', this)">SELECT</div>
+    <div class="tab" onclick="sw('where', this)">WHERE</div>
+    <div class="tab" onclick="sw('join', this)">JOIN</div>
+    <div class="tab" onclick="sw('group', this)">GROUP BY</div>
+    <div class="tab" onclick="sw('having', this)">HAVING</div>
+    <div class="tab" onclick="sw('crud', this)">INSERT/UPDATE/DELETE</div>
+    <div class="tab" onclick="sw('sub', this)">Subquery</div>
+    <div class="tab" onclick="sw('pk', this)">PK &amp; FK</div>
+    <div class="tab" onclick="sw('rel', this)">Quan hệ</div>
+    <div class="tab" onclick="sw('null', this)">NULL</div>
+    <div class="tab" onclick="sw('tool', this)">Công cụ</div>
+  </div>
+
+  <!-- SELECT -->
+  <div class="sec active" id="select">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">SELECT cơ bản</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Lấy cột name và age từ bảng users</p>
+        <div class="code"><span class="kw">SELECT</span> name, age <span class="kw">FROM</span> users;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>name</th><th>age</th></tr><tr><td>An</td><td>22</td></tr><tr><td>Bình</td><td>25</td></tr><tr><td>Chi</td><td>30</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">AS – đổi tên cột</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">AS chỉ đổi tên hiển thị, không thay đổi dữ liệu trong bảng</p>
+        <div class="code"><span class="kw">SELECT</span> name <span class="kw">AS</span> ten, age <span class="kw">AS</span> tuoi <span class="kw">FROM</span> users;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>ten</th><th>tuoi</th></tr><tr><td>An</td><td>22</td></tr><tr><td>Bình</td><td>25</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">DISTINCT – không trùng lặp</span><span><span class="badge good">Nên biết</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">Lấy danh sách phòng ban, mỗi tên chỉ xuất hiện 1 lần</p>
+        <div class="code"><span class="kw">SELECT DISTINCT</span> department <span class="kw">FROM</span> users;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>department</th></tr><tr><td>IT</td></tr><tr><td>Sale</td></tr><tr><td>HR</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHERE -->
+  <div class="sec" id="where">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">WHERE – lọc dòng</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Chỉ lấy người có tuổi lớn hơn 23</p>
+        <div class="code"><span class="kw">SELECT</span> name, age <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> age &gt; 23;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>name</th><th>age</th></tr><tr><td>Bình</td><td>25</td></tr><tr><td>Chi</td><td>30</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">AND / OR / IN</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">IN là cách viết gọn của nhiều OR</p>
+        <div class="code"><span class="kw">SELECT</span> name <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> department <span class="kw">IN</span> (<span class="str">'IT'</span>, <span class="str">'Sale'</span>);</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>name</th></tr><tr><td>An</td></tr><tr><td>Bình</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">LIKE – tìm chuỗi</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">% nghĩa là "bất kỳ ký tự nào". ILIKE giống LIKE nhưng không phân biệt hoa thường (chỉ có trong PostgreSQL)</p>
+        <div class="code"><span class="kw">SELECT</span> name, email <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> email <span class="kw">LIKE</span> <span class="str">'%@gmail.com'</span>;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>name</th><th>email</th></tr><tr><td>An</td><td>an@gmail.com</td></tr><tr><td>Chi</td><td>chi@gmail.com</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">ORDER BY &amp; LIMIT</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">Lấy 2 người lớn tuổi nhất</p>
+        <div class="code"><span class="kw">SELECT</span> name, age <span class="kw">FROM</span> users
+<span class="kw">ORDER BY</span> age <span class="kw">DESC</span>
+<span class="kw">LIMIT</span> 2;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>name</th><th>age</th></tr><tr><td>Chi</td><td>30</td></tr><tr><td>Bình</td><td>25</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- JOIN -->
+  <div class="sec" id="join">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">INNER JOIN</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Chỉ lấy dòng khớp ở cả 2 bảng. Dũng không có đơn hàng nên bị loại.</p>
+        <div class="code"><span class="kw">SELECT</span> u.name, o.product
+<span class="kw">FROM</span> users u
+<span class="kw">INNER JOIN</span> orders o <span class="kw">ON</span> u.id = o.user_id;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>name</th><th>product</th></tr><tr><td>An</td><td>Bàn phím</td></tr><tr><td>Bình</td><td>Chuột</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">LEFT JOIN</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">Lấy tất cả users. Dũng chưa có đơn hàng vẫn xuất hiện, cột product là NULL.</p>
+        <div class="code"><span class="kw">SELECT</span> u.name, o.product
+<span class="kw">FROM</span> users u
+<span class="kw">LEFT JOIN</span> orders o <span class="kw">ON</span> u.id = o.user_id;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>name</th><th>product</th></tr><tr><td>An</td><td>Bàn phím</td></tr><tr><td>Bình</td><td>Chuột</td></tr><tr><td>Dũng</td><td class="null-val">NULL</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- GROUP BY -->
+  <div class="sec" id="group">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">GROUP BY + COUNT</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Đếm số người trong mỗi phòng ban</p>
+        <div class="code"><span class="kw">SELECT</span> department, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> so_nguoi
+<span class="kw">FROM</span> users
+<span class="kw">GROUP BY</span> department;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>department</th><th>so_nguoi</th></tr><tr><td>IT</td><td>3</td></tr><tr><td>Sale</td><td>2</td></tr><tr><td>HR</td><td>1</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">GROUP BY + SUM / AVG</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">Tổng lương và lương trung bình theo phòng ban</p>
+        <div class="code"><span class="kw">SELECT</span> department,
+       <span class="fn">SUM</span>(salary) <span class="kw">AS</span> tong_luong,
+       <span class="fn">AVG</span>(salary) <span class="kw">AS</span> luong_tb
+<span class="kw">FROM</span> users
+<span class="kw">GROUP BY</span> department;</div>
+        <p class="result-label">Kết quả</p>
+        <table class="result"><tr><th>department</th><th>tong_luong</th><th>luong_tb</th></tr><tr><td>IT</td><td>30.000.000</td><td>10.000.000</td></tr><tr><td>Sale</td><td>16.000.000</td><td>8.000.000</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- HAVING -->
+  <div class="sec" id="having">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">HAVING – lọc sau GROUP BY</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Chỉ lấy phòng ban có từ 2 người trở lên. WHERE không dùng được với aggregate — phải dùng HAVING.</p>
+        <div class="code"><span class="kw">SELECT</span> department, <span class="fn">COUNT</span>(*) <span class="kw">AS</span> so_nguoi
+<span class="kw">FROM</span> users
+<span class="kw">GROUP BY</span> department
+<span class="kw">HAVING</span> <span class="fn">COUNT</span>(*) &gt;= 2;</div>
+        <p class="result-label">Kết quả (HR bị loại vì chỉ có 1 người)</p>
+        <table class="result"><tr><th>department</th><th>so_nguoi</th></tr><tr><td>IT</td><td>3</td></tr><tr><td>Sale</td><td>2</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- CRUD -->
+  <div class="sec" id="crud">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">INSERT</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <div class="code"><span class="kw">INSERT INTO</span> users (name, age, department)
+<span class="kw">VALUES</span> (<span class="str">'Dũng'</span>, 28, <span class="str">'IT'</span>);</div>
+        <p class="result-label">Thêm 1 dòng mới vào bảng users</p>
+        <table class="result"><tr><th>id</th><th>name</th><th>age</th><th>department</th></tr><tr><td>1</td><td>An</td><td>22</td><td>IT</td></tr><tr><td>2</td><td>Bình</td><td>25</td><td>Sale</td></tr><tr><td style="color:#166534;font-weight:600">3</td><td style="color:#166534;font-weight:600">Dũng</td><td style="color:#166534;font-weight:600">28</td><td style="color:#166534;font-weight:600">IT</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">UPDATE</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note danger">Luôn phải có WHERE. Không có WHERE sẽ cập nhật toàn bộ bảng!</p>
+        <div class="code"><span class="kw">UPDATE</span> users
+<span class="kw">SET</span> age = 23
+<span class="kw">WHERE</span> name = <span class="str">'An'</span>;</div>
+        <p class="result-label">age của An đổi từ 22 thành 23</p>
+        <table class="result"><tr><th>name</th><th>age</th></tr><tr><td>An</td><td style="color:#166534;font-weight:600">23</td></tr><tr><td>Bình</td><td>25</td></tr></table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">DELETE</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note danger">Luôn phải có WHERE. Không có WHERE sẽ xóa toàn bộ bảng!</p>
+        <div class="code"><span class="kw">DELETE FROM</span> users
+<span class="kw">WHERE</span> name = <span class="str">'Chi'</span>;</div>
+        <p class="result-label">Dòng Chi bị xóa</p>
+        <table class="result"><tr><th>name</th><th>age</th></tr><tr><td>An</td><td>22</td></tr><tr><td>Bình</td><td>25</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUBQUERY -->
+  <div class="sec" id="sub">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">Subquery trong WHERE</span><span><span class="badge good">Nên biết</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Tìm người có lương cao hơn mức trung bình</p>
+        <div class="code"><span class="kw">SELECT</span> name, salary <span class="kw">FROM</span> users
+<span class="kw">WHERE</span> salary &gt; (
+    <span class="kw">SELECT</span> <span class="fn">AVG</span>(salary) <span class="kw">FROM</span> users
+);</div>
+        <p class="result-label">Lương TB = 9tr → chỉ lấy người lương trên 9tr</p>
+        <table class="result"><tr><th>name</th><th>salary</th></tr><tr><td>Chi</td><td>12.000.000</td></tr><tr><td>Bình</td><td>10.000.000</td></tr></table>
+      </div>
+    </div>
+  </div>
+
+  <!-- PK FK -->
+  <div class="sec" id="pk">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">Primary Key (PK)</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Primary Key là cột định danh duy nhất mỗi dòng. Không được trùng, không được NULL. Thường là cột <code>id</code>.</p>
+        <div class="diag-wrap">
+          <table class="diag-table">
+            <tr><th>id (PK)</th><th>name</th><th>email</th></tr>
+            <tr><td class="pk-val">1</td><td>An</td><td>an@gmail.com</td></tr>
+            <tr><td class="pk-val">2</td><td>Bình</td><td>binh@gmail.com</td></tr>
+            <tr><td class="pk-val">3</td><td>Chi</td><td>chi@gmail.com</td></tr>
+          </table>
+        </div>
+        <div class="code"><span class="kw">CREATE TABLE</span> users (
+    id    <span class="fn">SERIAL</span> <span class="kw">PRIMARY KEY</span>,  <span class="cm">-- tự tăng, không trùng</span>
+    name  <span class="fn">TEXT</span>,
+    email <span class="fn">TEXT</span>
+);</div>
+        <p class="note">Trong Odoo, mọi bảng đều có <code>id SERIAL PRIMARY KEY</code> được tạo tự động.</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">Foreign Key (FK)</span><span><span class="badge must">Bắt buộc</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">Foreign Key là cột ở bảng này trỏ tới Primary Key của bảng khác. Đây là lý do JOIN hoạt động được.</p>
+        <div class="flex-tables">
+          <div class="diag-wrap">
+            <p class="result-label">Bảng users</p>
+            <table class="diag-table">
+              <tr><th>id (PK)</th><th>name</th></tr>
+              <tr><td class="pk-val">1</td><td>An</td></tr>
+              <tr><td class="pk-val">2</td><td>Bình</td></tr>
+              <tr><td class="pk-val">3</td><td>Chi</td></tr>
+            </table>
+          </div>
+          <div class="diag-wrap">
+            <p class="result-label">Bảng orders</p>
+            <table class="diag-table">
+              <tr><th>id (PK)</th><th>product</th><th>user_id (FK)</th></tr>
+              <tr><td class="pk-val">101</td><td>Bàn phím</td><td class="fk-val">1</td></tr>
+              <tr><td class="pk-val">102</td><td>Chuột</td><td class="fk-val">1</td></tr>
+              <tr><td class="pk-val">103</td><td>Màn hình</td><td class="fk-val">2</td></tr>
+              <tr><td class="pk-val">104</td><td>Tai nghe</td><td class="fk-val">3</td></tr>
+            </table>
+          </div>
+        </div>
+        <p class="note warn">user_id = 1 nghĩa là "đơn hàng này thuộc về người có id=1 trong bảng users". Đây chính là điều kiện ON trong JOIN.</p>
+        <div class="code"><span class="kw">CREATE TABLE</span> orders (
+    id      <span class="fn">SERIAL</span> <span class="kw">PRIMARY KEY</span>,
+    product <span class="fn">TEXT</span>,
+    user_id <span class="fn">INTEGER</span> <span class="kw">REFERENCES</span> users(id)  <span class="cm">-- FK</span>
+);</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- QUAN HE -->
+  <div class="sec" id="rel">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">One-to-Many (1 → N) — phổ biến nhất</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">1 khách hàng có thể có nhiều đơn hàng. Trong Odoo đây là Many2one field.</p>
+        <div class="relation-row">
+          <div class="rel-box">1 user</div>
+          <div class="rel-arrow">→→→</div>
+          <div class="rel-box">nhiều orders</div>
+          <div class="rel-note" style="margin-left:8px">Dùng FK: orders.user_id → users.id</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">One-to-One (1 → 1)</span><span><span class="badge good">Nên biết</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note">1 user có đúng 1 tài khoản hệ thống. Ít gặp hơn One-to-Many.</p>
+        <div class="relation-row">
+          <div class="rel-box">1 user</div>
+          <div class="rel-arrow">→</div>
+          <div class="rel-box">1 profile</div>
+          <div class="rel-note" style="margin-left:8px">Dùng FK + UNIQUE constraint</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">Many-to-Many (N → N) — cần bảng trung gian</span><span><span class="badge good">Nên biết</span><span class="chev">▼</span></span></div>
+      <div class="card-body">
+        <p class="note warn">Không thể dùng FK thông thường. Cần tạo thêm 1 bảng trung gian chứa 2 FK. Odoo tự tạo bảng này khi dùng Many2many field.</p>
+        <div class="relation-row" style="flex-wrap:wrap">
+          <div class="rel-box">nhiều students</div>
+          <div class="rel-arrow">→</div>
+          <div class="rel-mid">enrollments<br><small>student_id (FK)<br>course_id (FK)</small></div>
+          <div class="rel-arrow">→</div>
+          <div class="rel-box">nhiều courses</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NULL -->
+  <div class="sec" id="null">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">NULL vs 0 vs chuỗi rỗng</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">NULL không phải số 0, không phải "". NULL nghĩa là "không có giá trị" — hoàn toàn vắng mặt.</p>
+        <table class="result" style="margin-bottom:12px">
+          <tr><th>Giá trị</th><th>Ý nghĩa</th><th>Ví dụ</th><th>Cách so sánh</th></tr>
+          <tr><td class="null-val">NULL</td><td>Không có giá trị</td><td>Chưa nhập SĐT</td><td><code>IS NULL</code></td></tr>
+          <tr><td>0</td><td>Có giá trị, bằng 0</td><td>Tổng tiền = 0đ</td><td><code>= 0</code></td></tr>
+          <tr><td>''</td><td>Có giá trị, chuỗi rỗng</td><td>Tên = ""</td><td><code>= ''</code></td></tr>
+        </table>
+        <div class="code"><span class="cm">-- Đúng</span>
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> phone <span class="kw">IS NULL</span>;
+<span class="kw">SELECT</span> * <span class="kw">FROM</span> users <span class="kw">WHERE</span> phone <span class="kw">IS NOT NULL</span>;
+
+<span class="cm">-- Sai: luôn trả về rỗng vì NULL không bằng gì cả</span>
+<span class="rd">SELECT * FROM users WHERE phone = NULL;</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONG CU -->
+  <div class="sec" id="tool">
+    <div class="card">
+      <div class="card-head" onclick="tog(this)"><span class="card-title">DBeaver &amp; pgAdmin</span><span><span class="badge must">Bắt buộc</span><span class="chev open">▼</span></span></div>
+      <div class="card-body open">
+        <p class="note">Cần 1 công cụ để kết nối PostgreSQL và chạy thử SQL.</p>
+        <div class="tool-grid">
+          <div class="tool-card featured">
+            <div class="tool-name">DBeaver</div>
+            <div class="tool-desc">Miễn phí, hỗ trợ mọi database. Giao diện trực quan, dễ xem cấu trúc bảng. Khuyên dùng cho người mới.</div>
+            <div class="tool-badge">Khuyên dùng</div>
+          </div>
+          <div class="tool-card">
+            <div class="tool-name">pgAdmin</div>
+            <div class="tool-desc">Công cụ chính thức của PostgreSQL. Đầy đủ tính năng hơn nhưng giao diện phức tạp hơn một chút.</div>
+          </div>
+        </div>
+        <p class="result-label">Các bước kết nối (DBeaver)</p>
+        <div class="steps">
+          1. Tải DBeaver tại <strong>dbeaver.io</strong><br>
+          2. New Connection → chọn <strong>PostgreSQL</strong><br>
+          3. Điền: Host = <code>localhost</code>, Port = <code>5432</code><br>
+          4. Database, Username, Password do Odoo setup sẵn<br>
+          5. Bấm <strong>Test Connection</strong> → Finish
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function sw(id, el) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.sec').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById(id).classList.add('active');
+}
+function tog(head) {
+  const body = head.nextElementSibling;
+  const chev = head.querySelector('.chev');
+  const isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  chev.classList.toggle('open', !isOpen);
+}
+</script>
+</body>
+</html>
